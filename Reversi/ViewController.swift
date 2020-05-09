@@ -18,6 +18,8 @@ class ViewController: UIViewController {
     @IBOutlet private var countLabels: [UILabel]!
     @IBOutlet private var playerActivityIndicators: [UIActivityIndicatorView]!
     
+    private var board: Board = Board(width: 8, height: 8)
+    
     /// どちらの色のプレイヤーのターンかを表します。ゲーム終了時は `nil` です。
     private var turn: Disk? = .dark
     
@@ -58,8 +60,8 @@ extension ViewController {
     func countDisks(of side: Disk) -> Int {
         var count = 0
         
-        for y in boardView.yRange {
-            for x in boardView.xRange {
+        for y in board.range.y {
+            for x in board.range.x {
                 if boardView.diskAt(x: x, y: y) == side {
                     count +=  1
                 }
@@ -138,8 +140,8 @@ extension ViewController {
     func validMoves(for side: Disk) -> [(x: Int, y: Int)] {
         var coordinates: [(Int, Int)] = []
         
-        for y in boardView.yRange {
-            for x in boardView.xRange {
+        for y in board.range.y {
+            for x in board.range.x {
                 if canPlaceDisk(side, atX: x, y: y) {
                     coordinates.append((x, y))
                 }
@@ -417,8 +419,8 @@ extension ViewController {
         }
         output += "\n"
         
-        for y in boardView.yRange {
-            for x in boardView.xRange {
+        for y in board.range.y {
+            for x in board.range.x {
                 output += boardView.diskAt(x: x, y: y).symbol
             }
             output += "\n"
@@ -463,7 +465,7 @@ extension ViewController {
         }
 
         do { // board
-            guard lines.count == boardView.height else {
+            guard lines.count == board.size.height else {
                 throw FileIOError.read(path: path, cause: nil)
             }
             
@@ -475,12 +477,12 @@ extension ViewController {
                     boardView.setDisk(disk, atX: x, y: y, animated: false)
                     x += 1
                 }
-                guard x == boardView.width else {
+                guard x == board.size.width else {
                     throw FileIOError.read(path: path, cause: nil)
                 }
                 y += 1
             }
-            guard y == boardView.height else {
+            guard y == board.size.height else {
                 throw FileIOError.read(path: path, cause: nil)
             }
         }
